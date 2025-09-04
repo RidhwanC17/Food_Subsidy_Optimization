@@ -1,0 +1,240 @@
+\documentclass[12pt]{article}
+\usepackage[a4paper, margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{tocloft}
+\usepackage{natbib}
+\usepackage{parskip}
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    citecolor=blue
+}
+\begin{document}
+\clearpage
+% Page 1: Title Page
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    {\LARGE\bfseries Stochastic Optimization of Food Subsidy Allocation Using NSSO Household Consumption Data\par}
+    \vspace{1.5cm}
+    {\large\itshape Author:\par}
+    {\large Ridhwan Choudhari (BSD-CC-2417)\par}
+    {\large Rajneesh Yadav (BSD-CC-2415)\par}
+    {\large\itshape Supervised By:\par}
+    {\large Prof. Kaushik Jana\par}
+    \vspace{1cm}
+    {\large In Partial Fulfillment of the requirements for the Degree of Bachelor Of Statistical Data Science\par}
+    \vspace{2cm}
+\end{titlepage}
+
+% Page 2: Table of Contents
+
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\tableofcontents
+
+\clearpage
+% Page 3: Section 1
+\section{Problem}
+India, despite being the world's largest producer of several food commodities, continues to grapple with widespread food insecurity, especially among lower-income households. The Global Hunger Index 2023 highlights India’s concerning levels of undernourishment, drawing attention to the gap between food production and equitable food access. Similarly, news coverage around the National Family Health Survey (NFHS-5) findings points to significant disparities in access to sufficient and nutritious food across different socio-economic groups.
+
+While government interventions such as the Public Distribution System (PDS) and food subsidies aim to alleviate hunger, there is growing concern about whether these resources are optimally allocated to those who need it most.
+
+The issue is further complicated by random fluctuations in local food prices due to supply chain disruptions, seasonal variations, and market dynamics, household-level heterogeneity in food expenditure needs, and budgetary constraints faced by policymakers. A static, one-size-fits-all subsidy mechanism may lead to inefficiencies — under-provision for some vulnerable households and over-provision for others.
+
+Motivated by these findings, and drawing upon personal observations of inequities in food access in local communities during periods of price volatility (such as during COVID-19 lockdowns), this project seeks to explore how data-driven optimization techniques can improve food subsidy allocation.
+
+\textbf{Research Question (RQ):}
+
+How can a fixed food subsidy budget be optimally allocated across households to minimize the expected weighted per capita shortfall in food consumption, under random food prices and varying household vulnerability?
+
+
+% Page 4: Section 2
+\section{PLAN}
+This project formulates the food subsidy allocation challenge as a stochastic optimization problem. The goal is to contribute towards more effective and equitable food security policies through statistically sound optimization methods.
+
+\subsection{Model Development}
+Key components of the model are as follows:
+\begin{itemize}
+    \item \textbf{Household Stratification}: Households are categorized into 12 fractile groups for both rural and urban sectors. Estimated per capita food expenditure is obtained by applying average food shares to MPCE values. The model uses average values for each fractile group, including MPCE, food share (percentage of MPCE spent on food), and average household size.
+    \item \textbf{Stochastic Price Simulation}: To capture price variability, food prices are simulated 1,000 times per group using a normal distribution (mean = 1.0, standard deviation = 0.1), ensuring all prices remain positive.
+    \item \textbf{Shortfall Function}: For each group and simulation, a shortfall is calculated as the amount by which effective per capita food consumption falls short of a predefined threshold (₹1891 for rural and ₹2078 for urban). The model uses a power function controlled by parameter $\gamma$ (set to 1) to capture the severity of shortfalls.
+    \item \textbf{Weighted Aggregation}: Initial shortfalls without subsidies are used to generate weights for each group, emphasizing higher-need populations in the optimization objective. We have used dynamic weighting, based on initial shortfall.
+    \item \textbf{Solver Setup}: The optimization is performed using the Sequential Least Squares Programming (SLSQP) algorithm, ensuring non-negative subsidies and compliance with the total budget constraint.
+\end{itemize}
+
+\subsection{Methodology}
+\begin{enumerate}
+    \item Descriptive analysis of MPCE across income fractiles
+    \item Stochastic modeling to simulate expected shortfalls under price volatility
+    \item Optimization using SLSQP under a fixed budget
+    \item Comparative graphs and visualizations
+\end{enumerate}
+
+
+% Page 5: Section 3 up to 3.2
+\section{DATA}
+\subsection{Data Source and Study Design}
+This study uses secondary data from the Household Consumption Expenditure Survey (HCES) 2022–23, conducted by the National Statistical Office (NSO) under the Ministry of Statistics and Programme Implementation (MoSPI), Government of India.
+
+The HCES 2022–23 was based on a probabilistic, stratified multistage sampling design, ensuring national and state-level representativeness for both rural and urban sectors.
+
+multistage stratified sampling design
+\begin{itemize}
+    \item \textbf{Primary Sampling Units (PSUs)}: Villages (rural) and urban blocks (urban) were the first stage units.
+    \item \textbf{Ultimate Sampling Units (USUs)}: Households within each PSU
+    \item \textbf{Selection Method}: Households were selected using Simple Random Sampling Without Replacement (SRSWOR).
+    \item \textbf{Stratification} based on land ownership (rural) and car ownership (urban) to ensure economic diversity.
+\end{itemize}
+
+Additionally:
+
+Data were collected through Computer-Assisted Personal Interviewing (CAPI) and each selected household was visited three times across three months, using different questionnaires in each visit to avoid response bias
+
+\vspace{1cm} % Mimicking the space left after "to avoid response bia"
+
+\subsection{Data Collection}
+\textbf{Table 1 : Sample Design and Size}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{ll}
+        \toprule
+        \textbf{Category} & \textbf{Details} \\
+        \midrule
+        Total Households & 2,61,746 \\
+        Rural & 1,95,014 households (8,723 villages) \\
+        Urban & 1,06,732 households (6,115 blocks) \\
+        Geographic Coverage & All states and UTs (except remote Andaman \& Nicobar villages) \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+
+% Page 6: Section 3, subsections 3.3 and 3.4
+\subsection{Data Description}
+The data provides household-level and per capita-level consumption expenditure information across a wide array of items, categorized under food and non-food heads. For this study focused on food subsidy modeling, variables related to food consumption, household size, household sector (rural/urban), and price data were extracted and used. The primary dependent variable in the optimization model was derived from per capita food expenditure, and prices were estimated as unit values (expenditure divided by quantity). Subsidy weights and shortfall gaps were derived, prices were simulated.
+
+\subsection{Data Cleaning and Processing}
+The dataset used in this model is already cleaned and aggregated. Therefore, there was no need for imputation or handling of missing household data. The focus is entirely on group-level modeling.
+
+
+% Page 7: Section 4 up to 4.2
+\section{Analysis}
+\subsection{Optimization Model}
+\textbf{Objective Function:}
+
+\[
+\min \mathbb{E}_p \left[ \sum_i w_i \cdot \max\left(0, \theta_i - \frac{e_i + x_i}{p_i h_i}\right) \right]
+\]
+
+\textbf{Subject to:}
+
+\[
+\sum_i x_i \leq B, \quad x_i \geq 0 \quad \forall i
+\]
+
+\textbf{Variable Descriptions:}
+\begin{itemize}
+    \item $x_i$: Subsidy allocated to MPCE group $i$
+    \item $p_i$: Random price of food (simulated from a normal distribution for group $i$)
+    \item $h_i$: Average household size in group $i$
+    \item $e_i$: Current food expenditure in household $i$
+    \item $\theta_i$: Nutritional threshold (₹1891 for rural, ₹2078 for urban)
+    \item $w_i$: Weight of group $i$, proportional to initial shortfall and population share
+    \item $B$: Total subsidy budget available
+\end{itemize}
+
+\subsection{Optimization Method: SLSQP}
+We solve the model using the Sequential Least Squares Programming (SLSQP) algorithm. This is a widely used method for constrained nonlinear optimization.
+
+SLSQP is well-suited for our problem because:
+\begin{itemize}
+    \item It handles both equality and inequality constraints.
+    \item It works for smooth nonlinear objective functions.
+    \item It can handle bound constraints on variables ($x_i \geq 0$).
+\end{itemize}
+
+We implemented the solution using Python’s \texttt{scipy.optimize.minimize()} function with the \texttt{method='SLSQP'} op
+
+
+% Page 8: Section 4.3
+\subsection{Plotting And Inferences}
+\textbf{Subsidy Allocation Across Fractile Groups:}
+
+Shows the percentage of the budget allocated to each group. Lower MPCE groups receive more due to weighted allocation after seeing shortfall.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{latex p1.png}
+    \caption{}
+    \label{fig:subsidy_allocation}
+\end{figure}
+
+\vspace{2cm} % Mimicking the space left for the figure
+\clearpage
+\textbf{Shortfall Before vs. After Subsidy:}
+
+Compares the average shortfall in food expenditure (as a \% of the threshold) before and after the subsidy. The plots confirm that targeted subsidies significantly improve food security for the most vulnerable shows how optimal subsidy allocation can help reduce shortfall.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{latex p2.png}
+    \caption{}
+    \label{fig:shortfall_comparison}
+\end{figure}
+
+\vspace{2cm} % Mimicking the space left for the figure
+
+
+% Page 9: Section 5
+\section{Conclusion}
+\subsection{Key Insights:}
+\begin{itemize}
+    \item \textbf{Targeting}: The majority of the budget is directed at the bottom 30–40\% MPCE groups in both rural and urban areas — those with the greatest food shortfalls. Hence, the model acts progressively — higher relative allocations are made to poorer groups, reflecting a need-based policy design.
+    \item \textbf{Limitations:}
+    \begin{enumerate}
+        \item Some shortfall remains in middle-income urban groups due to budget limits.
+        \item We have assumed the budget is 1.5 times initial shortfall while allocating optimal subsidies but have taken this and account while plotting shortfall before v/s after by taking it 0.7 times and hence making practical and realistic sense.
+    \end{enumerate}
+\end{itemize}
+
+\subsection{Implications for Policy}
+The framework can be adapted for state-level or district-level targeting, depending on available data. By using actual consumption and price variation data, this approach is grounded in empirical realism, making it well-suited for government planning bodies like the Ministry of Consumer Affairs or NITI Aayog.
+
+\subsection{New Ideas}
+\begin{itemize}
+    \item Incorporating individual-level data or additional vulnerability indicators (e.g., child malnutrition, gender) could refine targeting.
+    \item The model can be extended to incorporate temporal variations by accounting for inflation and evolving household needs over time.
+\end{itemize}
+
+% Page 10: Sections 6 and 7
+\section{Acknowledgments}
+We gratefully acknowledge the invaluable guidance and support of Prof. Kaushik Jana, whose teaching and critical insights throughout the course significantly shaped the development of this project. His emphasis on bridging theoretical frameworks with applied policy challenges provided the foundation for our approach to modeling food subsidy allocation.
+
+We also extend our appreciation to the teaching assistant Mr. Subhajit Pramanick for their consistent support, constructive feedback, and clarifications, which were instrumental during both the formulation and implementation stages of this work.
+
+We would like to thank the National Statistical Office (NSO), Ministry of Statistics and Programme Implementation (MoSPI), Government of India, for making the Household Consumption Expenditure Survey (HCES) 2022–23 dataset publicly available. This high-quality dataset enabled a meaningful exploration of food subsidy targeting in India and served as the empirical backbone of our analysis.
+
+\section{REFERENCES}
+\begin{thebibliography}{9}
+    \bibitem{hces2023}
+    \href{https://www.mospi.gov.in/publication/factsheet-household-consumption-expendit}{Household Consumption Expenditure Survey (HCES) 2022–23}.
+    
+    \bibitem{hces_factsheet}
+    \href{https://www.mospi.gov.in/publication/factsheet-household-consumption-expenditure-survey-hces2022-23}{Factsheet of Household Consumption Expenditure Survey (HCES) 2022-23}.
+    
+    \bibitem{nss68}
+    \href{https://mospi.gov.in/sites/default/files/publication_reports/nss_rep_563_13mar15.pdf}{NSS 68th round data}.
+    
+    \bibitem{boyd2004}
+    \href{https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf}{Boyd, S., \& Vandenberghe, L. (2004). \textit{Convex Optimization}. Cambridge University Press}.
+\end{thebibliography}
+
+\end{document}
